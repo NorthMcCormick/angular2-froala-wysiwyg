@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Renderer, Input, Output, Optional, EventEmitter } from '@angular/core';
-import { * } as jQuery from "jquery";
+import * as jQuery from "jquery";
 
 @Directive({
   selector: '[froalaEditor]'
