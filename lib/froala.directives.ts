@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Renderer, Input, Output, Optional, EventEmitter } from '@angular/core';
-import { * } as $ from "jquery";
+import { * } as jQuery from "jquery";
 
 @Directive({
   selector: '[froalaEditor]'
@@ -13,7 +13,7 @@ export class FroalaEditorDirective {
   };
 
   // jquery wrapped element
-  private _$element: any;
+  private _jQueryelement: any;
 
   private SPECIAL_TAGS: string[] = ['img', 'button', 'input', 'a'];
   private INNER_HTML_ATTR: string = 'innerHTML';
@@ -41,7 +41,7 @@ export class FroalaEditorDirective {
     }
 
     // jquery wrap and store element
-    this._$element = (<any>$(element));
+    this._jQueryelement = (<any>jQuery(element));
   }
 
   // froalaEditor directive as input: store the editor options
@@ -74,7 +74,7 @@ export class FroalaEditorDirective {
 
     if (this._hasSpecialTag) {
 
-      let attributeNodes = this._$element[0].attributes;
+      let attributeNodes = this._jQueryelement[0].attributes;
       let attrs = {};
 
       for (let i = 0; i < attributeNodes.length; i++ ) {
@@ -86,14 +86,14 @@ export class FroalaEditorDirective {
         attrs[attrName] = attributeNodes[i].value;
       }
 
-      if (this._$element[0].innerHTML) {
-        attrs[this.INNER_HTML_ATTR] = this._$element[0].innerHTML;
+      if (this._jQueryelement[0].innerHTML) {
+        attrs[this.INNER_HTML_ATTR] = this._jQueryelement[0].innerHTML;
       }
 
       modelContent = attrs;
     } else {
 
-      let returnedHtml: any = this._$element.froalaEditor('html.get');
+      let returnedHtml: any = this._jQueryelement.froalaEditor('html.get');
       if (typeof returnedHtml === 'string') {
         modelContent = returnedHtml;
       }
@@ -119,7 +119,7 @@ export class FroalaEditorDirective {
     let self = this;
 
     // bind contentChange and keyup event to froalaModel
-    this.registerEvent(this._$element, 'froalaEditor.contentChanged',function () {
+    this.registerEvent(this._jQueryelement, 'froalaEditor.contentChanged',function () {
       self.updateModel();
     });
     if (this._opts.immediateAngularModelUpdate) {
@@ -139,7 +139,7 @@ export class FroalaEditorDirective {
     for (let eventName in this._opts.events) {
 
       if (this._opts.events.hasOwnProperty(eventName)) {
-        this.registerEvent(this._$element, eventName, this._opts.events[eventName]);
+        this.registerEvent(this._jQueryelement, eventName, this._opts.events[eventName]);
       }
     }
   }
@@ -156,7 +156,7 @@ export class FroalaEditorDirective {
     this.registerFroalaEvents();
 
     // init editor
-    this._editor = this._$element.froalaEditor(this._opts).data('froala.editor').$el;
+    this._editor = this._jQueryelement.froalaEditor(this._opts).data('froala.editor').jQueryel;
 
     this.initListeners();
 
@@ -164,11 +164,11 @@ export class FroalaEditorDirective {
   }
 
   private setHtml() {
-    this._$element.froalaEditor('html.set', this._model || '', true);
+    this._jQueryelement.froalaEditor('html.set', this._model || '', true);
 
     //This will reset the undo stack everytime the model changes externally. Can we fix this?
-    this._$element.froalaEditor('undo.reset');
-    this._$element.froalaEditor('undo.saveStep');
+    this._jQueryelement.froalaEditor('undo.reset');
+    this._jQueryelement.froalaEditor('undo.saveStep');
   }
 
   private setContent(firstTime = false) {
@@ -186,17 +186,17 @@ export class FroalaEditorDirective {
 
           for (let attr in tags) {
             if (tags.hasOwnProperty(attr) && attr != this.INNER_HTML_ATTR) {
-              this._$element.attr(attr, tags[attr]);
+              this._jQueryelement.attr(attr, tags[attr]);
             }
           }
 
           if (tags.hasOwnProperty(this.INNER_HTML_ATTR)) {
-            this._$element[0].innerHTML = tags[this.INNER_HTML_ATTR];
+            this._jQueryelement[0].innerHTML = tags[this.INNER_HTML_ATTR];
           }
         }
       } else {
         if (firstTime) {
-          this.registerEvent(this._$element, 'froalaEditor.initialized', function () {
+          this.registerEvent(this._jQueryelement, 'froalaEditor.initialized', function () {
             self.setHtml();
           });
         } else {
@@ -209,17 +209,17 @@ export class FroalaEditorDirective {
 
   private destroyEditor() {
     if (this._editorInitialized) {
-      this._$element.off(this._listeningEvents.join(" "));
+      this._jQueryelement.off(this._listeningEvents.join(" "));
       this._editor.off('keyup');
-      this._$element.froalaEditor('destroy');
+      this._jQueryelement.froalaEditor('destroy');
       this._listeningEvents.length = 0;
       this._editorInitialized = false;
     }
   }
 
   private getEditor() {
-    if (this._$element) {
-      return this._$element.froalaEditor.bind(this._$element);
+    if (this._jQueryelement) {
+      return this._jQueryelement.froalaEditor.bind(this._jQueryelement);
     }
 
     return null;
